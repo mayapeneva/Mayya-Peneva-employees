@@ -1,4 +1,5 @@
 using Mayya_Peneva_employees.Client.Pages;
+using Mayya_Peneva_employees.Client.Services;
 using Mayya_Peneva_employees.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
+
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+
 
 var app = builder.Build();
 
