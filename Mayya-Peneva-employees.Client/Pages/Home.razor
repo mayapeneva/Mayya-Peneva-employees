@@ -2,6 +2,47 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Employees</h1>
+<container>
+    <h1>Employees</h1>
 
-Pair of employees who have worked together  on common projects.
+    Shows employees who have worked together on common projects.
+    <hr />
+
+    <EditForm Model="Input" method="post" OnValidSubmit="LoadFile" FormName="addFileForm">
+        <DataAnnotationsValidator />
+        <div class="form-group">
+            <h6>Pick up a file from your file system:</h6>
+            <InputFile class="form-control" OnChange="@SetFile" />
+            <ValidationMessage For="() => Input.CsvFile" class="text-danger" />
+            <Button Type="ButtonType.Submit">Select</Button>
+        </div>
+    </EditForm>
+
+</container>
+
+@code {
+    private FileInputModel Input = new();
+
+    private void SetFile(InputFileChangeEventArgs e)
+    {
+        Input.CsvFile = e.GetMultipleFiles().FirstOrDefault();
+    }
+
+    private async Task LoadFile()
+    {
+        if (Input.CsvFile is not null)
+        {
+            var employeeList = new List<Employee>();
+            using (var reader = new StreamReader(Input.CsvFile.OpenReadStream()))
+            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+            {
+                await foreach (var employeeInput in csv.GetRecordsAsync<EmployeeInput>())
+                {
+                    var employee = employeeInput.ConvertToEmployee();
+                    if(employee is not null) 
+                        employeeList.Add(employee);
+                }
+            }
+        }
+    }
+}
