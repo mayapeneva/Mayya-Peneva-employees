@@ -4,42 +4,42 @@
 
 <PageTitle>Home</PageTitle>
 
-<container>
-    <h1>Employees</h1>
+<h1>Employees</h1>
+<p>Shows employees who have worked together on common projects for the longest period of time</p>
+<hr />
 
-    Shows employees who have worked together on common projects.
-    <hr />
-
-    <EditForm Model="Input" method="post" OnValidSubmit="LoadEmployees" FormName="addFileForm">
+<container class="employee-container">
+    <EditForm class="file-form" Model="Input" method="post" OnValidSubmit="LoadEmployees" FormName="addFileForm">
         <DataAnnotationsValidator />
         <div class="form-group">
             <div class="row">
                 <h6>Pick up a file from your file system:</h6>
-                <div class="col-md-8">
+                <div class="col-md-6">
                     <InputFile class="form-control" OnChange="@LoadFile" />
                     <ValidationMessage For="() => Input!.CsvFile" class="text-danger" />
                 </div>
-                <div class="col-md-4">
-                    <Button Type="ButtonType.Submit">Select</Button>
+                <div class="col-md-2">
+                    <Button Class="btn-primary" Type="ButtonType.Submit">Select</Button>
                 </div>
             </div>
         </div>
     </EditForm>
 
+    @if (EmployeeIdsPairs is not null && EmployeeIdsPairs.Any())
+    {
+        <Card>
+            <CardBody>
+                <label>The employees who have worked together on common projects for the longest period of time are:</label>
+                @foreach (var kvp in EmployeeIdsPairs)
+                {
+                    <CardText>Employees with Ids @kvp.Key and @kvp.Value</CardText>
+                }
+            </CardBody>
+        </Card>
+    }
+
     @if (EmployeesPerProject is not null && EmployeesPerProject.Any())
     {
-        <div>
-            <Card Style="width:40rem;">
-                <CardBody>
-                    <label>The employees who have worked together on common projects for the longest period of time are:</label>
-                    @foreach (var kvp in EmployeeIdsPairs)
-                    {
-                        <CardText>Employees with Ids @kvp.Key and @kvp.Value</CardText>
-                    }
-                </CardBody>
-            </Card>
-        </div>
-
         <EmployeesGrid TModel="EmployeesViewModel" Employees="@EmployeesPerProject"></EmployeesGrid>
     }
 
@@ -49,13 +49,14 @@
     [SupplyParameterFromForm]
     private FileInputModel? Input { get; set; }
 
-    private IEnumerable<KeyValuePair<int, int>> EmployeeIdsPairs { get; set; }
+    private IEnumerable<KeyValuePair<int, int>>? EmployeeIdsPairs { get; set; }
 
     private IEnumerable<EmployeesViewModel>? EmployeesPerProject { get; set; }
 
     protected override void OnInitialized()
     {
         Input ??= new();
+        EmployeeIdsPairs = new List<KeyValuePair<int, int>>();
         EmployeesPerProject = new List<EmployeesViewModel>();
     }
 
