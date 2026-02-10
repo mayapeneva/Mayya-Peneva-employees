@@ -1,20 +1,22 @@
 ﻿using Mayya_Peneva_employees.Client.Core.Entities;
+using Mayya_Peneva_employees.Client.Core.Results;
 using Mayya_Peneva_employees.Client.ViewModels;
 
 namespace Mayya_Peneva_employees.Client.Core.Services
 {
     public class EmployeeService : IEmployeeService
     {
-        public IEnumerable<EmployeesViewModel> GetPairEmployeesWorkedLongest(IEnumerable<Employee> employees)
+        public EmploeeysResult GetPairEmployeesWorkedLongest(IEnumerable<Employee> employees)
         {
-            var employeeOneId = 0;
-            var employeeTwoId = 0;
+            var result = new EmploeeysResult();
+
+            var employeesWorkedTogether = new List<KeyValuePair<int, int>>();
             var highestDaysWorkedTogether = 0;
 
-            var employeePairs = new List<EmployeesViewModel>();
+            var employeesPerProject = new List<EmployeesViewModel>();
 
-            var employeesByProject = employees.GroupBy(e => e.ProjectId);
-            foreach (var projectGroup in employeesByProject)
+            var projectGroups = employees.GroupBy(e => e.ProjectId);
+            foreach (var projectGroup in projectGroups)
             {
                 var projectEmployees = projectGroup.ToArray();
                 for (int i = 0; i < projectEmployees.Length; i++)
@@ -35,11 +37,18 @@ namespace Mayya_Peneva_employees.Client.Core.Services
                             if (daysWorked > highestDaysWorkedTogether)
                             {
                                 highestDaysWorkedTogether = daysWorked;
-                                employeeOneId = employeeOne.Id;
-                                employeeTwoId  = employeeTwo.Id;
+                                employeesWorkedTogether.Clear();
+                                employeesWorkedTogether.Add(new KeyValuePair<int, int>(employeeOne.Id, employeeTwo.Id));
+                            }
+                            else if (daysWorked == highestDaysWorkedTogether)
+                            {
+                                if (!employeesWorkedTogether.Any(pair =>
+                                    (pair.Key == employeeOne.Id && pair.Value == employeeTwo.Id) ||
+                                    (pair.Key == employeeTwo.Id && pair.Value == employeeOne.Id)))
+                                        employeesWorkedTogether.Add(new KeyValuePair<int, int>(employeeOne.Id, employeeTwo.Id));
                             }
 
-                            employeePairs.Add(new EmployeesViewModel
+                            employeesPerProject.Add(new EmployeesViewModel
                             {
                                 EmployeeOneId = employeeOne.Id,
                                 EmployeeTwoId = employeeTwo.Id,
@@ -51,16 +60,28 @@ namespace Mayya_Peneva_employees.Client.Core.Services
                 }
             }
 
-            return employeePairs.Where(e => e.EmployeeOneId == employeeOneId && e.EmployeeTwoId == employeeTwoId);
+            if (employeesWorkedTogether.Count == 0)
+            {
+                result.Errors.Add("There are no employees who worked together on the same project.");
+                return result;
+            }
+
+            result.EmployeeIdsWorkedTogether = employeesWorkedTogether;
+            result.EmployeesPerProject = employeesPerProject
+                .Where(e => employeesWorkedTogether
+                    .Any(pair => pair.Key == e.EmployeeOneId && pair.Value == e.EmployeeTwoId 
+                            || pair.Key == e.EmployeeTwoId && pair.Value == e.EmployeeOneId));
+
+            return result;
         }
 
-        private bool HasOverlap(DateOnly startDateOne, DateOnly endDateOne, DateOnly startDateTwo, DateOnly endDateTwo) => 
+        private bool HasOverlap(DateOnly startDateOne, DateOnly endDateOne, DateOnly startDateTwo, DateOnly endDateTwo) =>
             startDateOne < endDateTwo && startDateTwo < endDateOne;
 
-        private DateOnly MaxDate(DateOnly dateOne, DateOnly dateTwo) => 
+        private DateOnly MaxDate(DateOnly dateOne, DateOnly dateTwo) =>
             dateOne > dateTwo ? dateOne : dateTwo;
 
-        private DateOnly MinDate(DateOnly dateOne, DateOnly dateTwo) => 
+        private DateOnly MinDate(DateOnly dateOne, DateOnly dateTwo) =>
             dateOne < dateTwo ? dateOne : dateTwo;
     }
 }

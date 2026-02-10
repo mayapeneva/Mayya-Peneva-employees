@@ -1,5 +1,4 @@
 using Mayya_Peneva_employees.Client.Core.Services;
-using Mayya_Peneva_employees.Client.Pages;
 using Mayya_Peneva_employees.Components;
 
 var builder = WebApplication.CreateBuilder(args);

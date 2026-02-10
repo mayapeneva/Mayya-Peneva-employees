@@ -26,9 +26,21 @@
         </div>
     </EditForm>
 
-    @if (Employees is not null && Employees.Any())
+    @if (EmployeesPerProject is not null && EmployeesPerProject.Any())
     {
-        <EmployeesGrid TModel="EmployeesViewModel" Employees="@Employees"></EmployeesGrid>
+        <div>
+            <Card Style="width:40rem;">
+                <CardBody>
+                    <label>The employees who have worked together on common projects for the longest period of time are:</label>
+                    @foreach (var kvp in EmployeeIdsPairs)
+                    {
+                        <CardText>Employees with Ids @kvp.Key and @kvp.Value</CardText>
+                    }
+                </CardBody>
+            </Card>
+        </div>
+
+        <EmployeesGrid TModel="EmployeesViewModel" Employees="@EmployeesPerProject"></EmployeesGrid>
     }
 
 </container>
@@ -37,12 +49,14 @@
     [SupplyParameterFromForm]
     private FileInputModel? Input { get; set; }
 
-    private IEnumerable<EmployeesViewModel>? Employees { get; set; }
+    private IEnumerable<KeyValuePair<int, int>> EmployeeIdsPairs { get; set; }
+
+    private IEnumerable<EmployeesViewModel>? EmployeesPerProject { get; set; }
 
     protected override void OnInitialized()
     {
         Input ??= new();
-        Employees = new List<EmployeesViewModel>();
+        EmployeesPerProject = new List<EmployeesViewModel>();
     }
 
     private void LoadFile(InputFileChangeEventArgs e)
@@ -63,10 +77,17 @@
                     var employee = employeeInput.ConvertToEmployee();
                     if (employee is not null)
                         employeeList.Add(employee);
+
+                    //TODO: Handle invalid input (e.g. log it, show error message to user etc.)
                 }
             }
 
-            Employees = EmployeeService.GetPairEmployeesWorkedLongest(employeeList);
+            var result = EmployeeService.GetPairEmployeesWorkedLongest(employeeList);
+            if (result.IsSuccessful())
+            {
+                EmployeeIdsPairs = result.EmployeeIdsWorkedTogether;
+                EmployeesPerProject = result.EmployeesPerProject;
+            }
         }
     }
 }
