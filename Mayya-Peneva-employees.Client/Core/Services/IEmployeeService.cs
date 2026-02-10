@@ -1,7 +1,7 @@
-﻿using Mayya_Peneva_employees.Client.Entities;
+﻿using Mayya_Peneva_employees.Client.Core.Entities;
 using Mayya_Peneva_employees.Client.ViewModels;
 
-namespace Mayya_Peneva_employees.Client.Services
+namespace Mayya_Peneva_employees.Client.Core.Services
 {
     public interface IEmployeeService
     {

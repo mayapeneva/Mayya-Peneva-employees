@@ -1,0 +1,33 @@
+﻿@typeparam TModel
+
+<div class="table container">
+    <Grid TItem="EmployeesViewModel"
+          Data="Employees"
+          AllowPaging="true"
+          Class="table table-hover table-bordered table-striped"
+          PageSize="10"
+          Responsive="true"
+          RowKeySelector="(emp) => emp.ProjectId">
+
+        <GridColumns>
+            <GridColumn TItem="EmployeesViewModel" HeaderText="Employee One Id" PropertyName="EmployeeOneId">
+                @context.EmployeeOneId
+            </GridColumn>
+            <GridColumn TItem="EmployeesViewModel" HeaderText="Employee Two Id" PropertyName="EmployeeTwoId">
+                @context.EmployeeTwoId
+            </GridColumn>
+            <GridColumn TItem="EmployeesViewModel" HeaderText="Project Id" PropertyName="ProjectId">
+                @context.ProjectId
+            </GridColumn>
+            <GridColumn TItem="EmployeesViewModel" HeaderText="Days Worked Together" PropertyName="DaysWorked">
+                @context.DaysWorked
+            </GridColumn>
+        </GridColumns>
+    </Grid>
+</div>
+
+@code {
+    [Parameter]
+    public IEnumerable<EmployeesViewModel>? Employees { get; set; } = [];
+
+}

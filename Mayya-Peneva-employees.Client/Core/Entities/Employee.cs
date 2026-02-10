@@ -1,7 +1,7 @@
 ﻿using CsvHelper.Configuration.Attributes;
 using System.ComponentModel.DataAnnotations;
 
-namespace Mayya_Peneva_employees.Client.Entities
+namespace Mayya_Peneva_employees.Client.Core.Entities
 {
     public class Employee
     {

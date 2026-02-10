@@ -26,6 +26,11 @@
         </div>
     </EditForm>
 
+    @if (Employees is not null && Employees.Any())
+    {
+        <EmployeesGrid TModel="EmployeesViewModel" Employees="@Employees"></EmployeesGrid>
+    }
+
 </container>
 
 @code {

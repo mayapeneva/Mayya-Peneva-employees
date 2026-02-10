@@ -1,5 +1,5 @@
 ﻿using CsvHelper.Configuration.Attributes;
-using Mayya_Peneva_employees.Client.Entities;
+using Mayya_Peneva_employees.Client.Core.Entities;
 using System.ComponentModel.DataAnnotations;
 
 namespace Mayya_Peneva_employees.Client.BindingModels
