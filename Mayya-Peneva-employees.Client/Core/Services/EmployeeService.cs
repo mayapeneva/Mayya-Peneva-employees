@@ -76,7 +76,7 @@ namespace Mayya_Peneva_employees.Client.Core.Services
         }
 
         private bool HasOverlap(DateOnly startDateOne, DateOnly endDateOne, DateOnly startDateTwo, DateOnly endDateTwo) =>
-            startDateOne < endDateTwo && startDateTwo < endDateOne;
+            startDateOne <= endDateTwo && startDateTwo <= endDateOne;
 
         private DateOnly MaxDate(DateOnly dateOne, DateOnly dateTwo) =>
             dateOne > dateTwo ? dateOne : dateTwo;
