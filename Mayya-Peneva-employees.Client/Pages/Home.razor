@@ -1,6 +1,7 @@
 ﻿@page "/"
 
 @inject IEmployeeService EmployeeService
+@inject ILogger<Home> Logger
 
 <PageTitle>Home</PageTitle>
 
@@ -12,14 +13,17 @@
     <EditForm class="file-form" Model="Input" method="post" OnValidSubmit="LoadEmployees" FormName="addFileForm">
         <DataAnnotationsValidator />
         <div class="form-group">
-            <div class="row">
+            <div class="row file-form-row">
                 <h6>Pick up a file from your file system:</h6>
                 <div class="col-md-6">
                     <InputFile class="form-control" OnChange="@LoadFile" />
                     <ValidationMessage For="() => Input!.CsvFile" class="text-danger" />
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-1">
                     <Button Class="btn-primary" Type="ButtonType.Submit">Select</Button>
+                </div>
+                <div class="col-md-1">
+                    <Button Type="ButtonType.Reset" @onclick="ClearAll">Clear</Button>
                 </div>
             </div>
         </div>
@@ -43,6 +47,13 @@
         <EmployeesGrid TModel="EmployeesViewModel" Employees="@EmployeesPerProject"></EmployeesGrid>
     }
 
+    @if (!String.IsNullOrWhiteSpace(ErrorMessage))
+    {
+        <div class="alert alert-danger">
+            @ErrorMessage
+        </div>
+    }
+
 </container>
 
 @code {
@@ -52,6 +63,8 @@
     private IEnumerable<KeyValuePair<int, int>>? EmployeeIdsPairs { get; set; }
 
     private IEnumerable<EmployeesViewModel>? EmployeesPerProject { get; set; }
+
+    private string? ErrorMessage { get; set; }
 
     protected override void OnInitialized()
     {
@@ -75,11 +88,17 @@
             {
                 await foreach (var employeeInput in csv.GetRecordsAsync<EmployeeInput>())
                 {
-                    var employee = employeeInput.ConvertToEmployee();
-                    if (employee is not null)
-                        employeeList.Add(employee);
+                    var employeeResult = employeeInput.ConvertToEmployee();
+                    if (!employeeResult.IsSuccessful())
+                    {
+                        ErrorMessage = "Note: There was some wrong data in the submitted file.";
+                        foreach (var error in employeeResult.Errors)
+                            Logger.LogWarning(error);
 
-                    //TODO: Handle invalid input (e.g. log it, show error message to user etc.)
+                        continue;
+                    }
+
+                    employeeList.Add(employeeResult.Employee!);
                 }
             }
 
@@ -90,5 +109,13 @@
                 EmployeesPerProject = result.EmployeesPerProject;
             }
         }
+    }
+
+    private void ClearAll()
+    {
+        Input = new();
+        EmployeeIdsPairs = new List<KeyValuePair<int, int>>();
+        EmployeesPerProject = new List<EmployeesViewModel>();
+        ErrorMessage = null;
     }
 }

@@ -1,4 +1,4 @@
-﻿using Mayya_Peneva_employees.Client.ViewModels;
+﻿using Mayya_Peneva_employees.Client.Models.ViewModels;
 
 namespace Mayya_Peneva_employees.Client.Core.Results
 {

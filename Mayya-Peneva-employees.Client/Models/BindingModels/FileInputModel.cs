@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
 using System.ComponentModel.DataAnnotations;
 
-namespace Mayya_Peneva_employees.Client.BindingModels
+namespace Mayya_Peneva_employees.Client.Models.BindingModels
 {
     public class FileInputModel
     {

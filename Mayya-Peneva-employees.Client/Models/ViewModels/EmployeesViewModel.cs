@@ -1,4 +1,4 @@
-﻿namespace Mayya_Peneva_employees.Client.ViewModels
+﻿namespace Mayya_Peneva_employees.Client.Models.ViewModels
 {
     public class EmployeesViewModel
     {
