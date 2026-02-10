@@ -1,5 +1,7 @@
 ﻿@page "/"
 
+@inject IEmployeeService EmployeeService
+
 <PageTitle>Home</PageTitle>
 
 <container>
@@ -8,29 +10,44 @@
     Shows employees who have worked together on common projects.
     <hr />
 
-    <EditForm Model="Input" method="post" OnValidSubmit="LoadFile" FormName="addFileForm">
+    <EditForm Model="Input" method="post" OnValidSubmit="LoadEmployees" FormName="addFileForm">
         <DataAnnotationsValidator />
         <div class="form-group">
-            <h6>Pick up a file from your file system:</h6>
-            <InputFile class="form-control" OnChange="@SetFile" />
-            <ValidationMessage For="() => Input.CsvFile" class="text-danger" />
-            <Button Type="ButtonType.Submit">Select</Button>
+            <div class="row">
+                <h6>Pick up a file from your file system:</h6>
+                <div class="col-md-8">
+                    <InputFile class="form-control" OnChange="@LoadFile" />
+                    <ValidationMessage For="() => Input!.CsvFile" class="text-danger" />
+                </div>
+                <div class="col-md-4">
+                    <Button Type="ButtonType.Submit">Select</Button>
+                </div>
+            </div>
         </div>
     </EditForm>
 
 </container>
 
 @code {
-    private FileInputModel Input = new();
+    [SupplyParameterFromForm]
+    private FileInputModel? Input { get; set; }
 
-    private void SetFile(InputFileChangeEventArgs e)
+    private IEnumerable<EmployeesViewModel>? Employees { get; set; }
+
+    protected override void OnInitialized()
     {
-        Input.CsvFile = e.GetMultipleFiles().FirstOrDefault();
+        Input ??= new();
+        Employees = new List<EmployeesViewModel>();
     }
 
-    private async Task LoadFile()
+    private void LoadFile(InputFileChangeEventArgs e)
     {
-        if (Input.CsvFile is not null)
+        Input!.CsvFile = e.GetMultipleFiles().FirstOrDefault();
+    }
+
+    private async Task LoadEmployees()
+    {
+        if (Input is not null && Input.CsvFile is not null)
         {
             var employeeList = new List<Employee>();
             using (var reader = new StreamReader(Input.CsvFile.OpenReadStream()))
@@ -39,10 +56,12 @@
                 await foreach (var employeeInput in csv.GetRecordsAsync<EmployeeInput>())
                 {
                     var employee = employeeInput.ConvertToEmployee();
-                    if(employee is not null) 
+                    if (employee is not null)
                         employeeList.Add(employee);
                 }
             }
+
+            Employees = EmployeeService.GetPairEmployeesWorkedLongest(employeeList);
         }
     }
 }

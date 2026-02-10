@@ -5,6 +5,6 @@ namespace Mayya_Peneva_employees.Client.Services
 {
     public interface IEmployeeService
     {
-        Task<IEnumerable<EmployeesViewModel>> GetPairEmployeesWorkedLongest(IEnumerable<Employee> employees);
+        IEnumerable<EmployeesViewModel> GetPairEmployeesWorkedLongest(IEnumerable<Employee> employees);
     }
 }
