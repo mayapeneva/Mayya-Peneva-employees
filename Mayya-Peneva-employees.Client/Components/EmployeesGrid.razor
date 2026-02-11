@@ -1,14 +1,13 @@
 ﻿@typeparam TModel
 
-<div class="table-container">
-    <label>Here is more detailed information on all projects that these employees have worked together:</label>
+    <label>Detailed information on all common projects of the above top collaborators:</label>
     <Grid TItem="EmployeesViewModel"
           Data="Employees"
           AllowPaging="true"
+          AutoHidePaging="true"
           Class="table table-hover table-bordered table-striped"
           PageSize="10"
-          Responsive="true"
-          RowKeySelector="(emp) => emp.ProjectId">
+          Responsive="true">
 
         <GridColumns>
             <GridColumn TItem="EmployeesViewModel" HeaderText="Employee One Id" PropertyName="EmployeeOneId">
@@ -25,7 +24,6 @@
             </GridColumn>
         </GridColumns>
     </Grid>
-</div>
 
 @code {
     [Parameter]

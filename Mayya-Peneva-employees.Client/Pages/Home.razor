@@ -5,84 +5,140 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Employees</h1>
-<p>Shows employees who have worked together on common projects for the longest period of time</p>
-<hr />
-
-<container class="employee-container">
-    <EditForm class="file-form" Model="Input" method="post" OnValidSubmit="LoadEmployees" FormName="addFileForm">
-        <DataAnnotationsValidator />
-        <div class="form-group">
-            <div class="row file-form-row">
-                <h6>Pick up a file from your file system:</h6>
-                <div class="col-md-6">
-                    <InputFile class="form-control" OnChange="@LoadFile" />
-                    <ValidationMessage For="() => Input!.CsvFile" class="text-danger" />
-                </div>
-                <div class="col-md-1">
-                    <Button Class="btn-primary" Type="ButtonType.Submit">Select</Button>
-                </div>
-                <div class="col-md-1">
-                    <Button Type="ButtonType.Reset" @onclick="ClearAll">Clear</Button>
-                </div>
-            </div>
+<div class="container mt-5" ">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2>Employee Collaboration</h2>
+            <p>Identify employee pairs who have worked together on common projects for the longest period of time</p>
+            <hr />
         </div>
-    </EditForm>
+    </div>
 
-    @if (EmployeeIdsPairs is not null && EmployeeIdsPairs.Any())
-    {
-        <Card>
-            <CardBody>
-                <label>The employees who have worked together on common projects for the longest period of time are:</label>
-                @foreach (var kvp in EmployeeIdsPairs)
-                {
-                    <CardText>Employees with Ids @kvp.Key and @kvp.Value</CardText>
-                }
-            </CardBody>
-        </Card>
-    }
+    <div class="row">
+        <div class="col-md-8">
+            <Card Class="mb-4">
+                <CardHeader Class="bg-primary text-white">
+                    <h5 class="mb-0">Upload Employee Data</h5>
+                </CardHeader>
+                <CardBody>
+                    <EditForm Model="Input" method="post" OnValidSubmit="LoadEmployees" FormName="addFileForm">
+                        <DataAnnotationsValidator />
+
+                        <div class="form-group mb-3">
+                            <label for="csvFile" class="form-label">Select CSV File:</label>
+                            <InputFile id="csvFile" class="form-control" OnChange="@LoadFile" accept=".csv" />
+                            <ValidationMessage For="() => Input!.CsvFile" class="text-danger small mt-1" />
+                            <small class="text-muted d-block mt-2">
+                                Expected format: EmployeeID, ProjectID, DateFrom, DateTo
+                            </small>
+                        </div>
+
+                        <div class="button-group d-flex gap-2">
+                            <Button Color="ButtonColor.Primary" Type="ButtonType.Submit" Disabled="@(Input?.CsvFile == null)">Select</Button>
+                            <Button Color="ButtonColor.Secondary" Type="ButtonType.Reset" @onclick="ClearAll">Clear</Button>
+                        </div>
+                    </EditForm>
+                </CardBody>
+            </Card>
+
+            @if (EmployeeIdsPairs is not null && EmployeeIdsPairs.Any())
+            {
+                <Card Class="mb-4">
+                    <CardHeader>
+                        <h5 class="mb-0">Top Collaborators</h5>
+                    </CardHeader>
+                    <CardBody>
+                        <div class="list-group">
+                            @foreach (var kvp in EmployeeIdsPairs)
+                            {
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">
+                                            <i class="bi bi-people-fill"></i>
+                                            Employee <span class="badge bg-info">@kvp.Key</span>
+                                            &amp;
+                                            Employee <span class="badge bg-info">@kvp.Value</span>
+                                        </h6>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </CardBody>
+                </Card>
+            }
+        </div>
+
+        <div class="col-md-4">
+            <Card Class="sticky-top">
+                <CardHeader Class="bg-light">
+                    <h6 class="mb-0">How It Works</h6>
+                </CardHeader>
+                <CardBody>
+                    <ol class="small">
+                        <li>Upload a CSV file with employee project information</li>
+                        <li>Click Select to see all pairs with longest collaboration time</li>
+                    </ol>
+                </CardBody>
+            </Card>
+        </div>
+    </div>
 
     @if (EmployeesPerProject is not null && EmployeesPerProject.Any())
     {
-        <EmployeesGrid TModel="EmployeesViewModel" Employees="@EmployeesPerProject"></EmployeesGrid>
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <EmployeesGrid TModel="EmployeesViewModel" Employees="@EmployeesPerProject"></EmployeesGrid>
+            </div>
+        </div>
     }
 
     @if (!String.IsNullOrWhiteSpace(ErrorMessage))
     {
-        <div class="alert alert-danger">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <h6 class="alert-heading">
+                <i class="bi bi-exclamation-triangle"></i> Error
+            </h6>
             @ErrorMessage
+            <button type="button" class="btn-close" @onclick="() => ErrorMessage = null"></button>
         </div>
     }
-
-</container>
+</div>
 
 @code {
     [SupplyParameterFromForm]
     private FileInputModel? Input { get; set; }
 
     private IEnumerable<KeyValuePair<int, int>>? EmployeeIdsPairs { get; set; }
-
     private IEnumerable<EmployeesViewModel>? EmployeesPerProject { get; set; }
-
     private string? ErrorMessage { get; set; }
 
     protected override void OnInitialized()
     {
         Input ??= new();
-        EmployeeIdsPairs = new List<KeyValuePair<int, int>>();
-        EmployeesPerProject = new List<EmployeesViewModel>();
+        EmployeeIdsPairs = [];
+        EmployeesPerProject = [];
     }
 
     private void LoadFile(InputFileChangeEventArgs e)
     {
         Input!.CsvFile = e.GetMultipleFiles().FirstOrDefault();
+        ErrorMessage = null;
     }
 
     private async Task LoadEmployees()
     {
-        if (Input is not null && Input.CsvFile is not null)
+        if (Input?.CsvFile == null)
+        {
+            ErrorMessage = "Please select a file first.";
+            return;
+        }
+
+        ErrorMessage = null;
+
+        try
         {
             var employeeList = new List<Employee>();
+
             using (var reader = new StreamReader(Input.CsvFile.OpenReadStream()))
             using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
@@ -94,7 +150,6 @@
                         ErrorMessage = "Note: There was some wrong data in the submitted file.";
                         foreach (var error in employeeResult.Errors)
                             Logger.LogWarning(error);
-
                         continue;
                     }
 
@@ -102,20 +157,34 @@
                 }
             }
 
-            var result = EmployeeService.GetPairEmployeesWorkedLongest(employeeList);
-            if (result.IsSuccessful())
+            if (employeeList.Count == 0)
             {
-                EmployeeIdsPairs = result.EmployeeIdsWorkedTogether;
-                EmployeesPerProject = result.EmployeesPerProject;
+                ErrorMessage = "No valid employee records found in the file.";
+                return;
             }
+
+            var result = EmployeeService.GetPairEmployeesWorkedLongest(employeeList);
+            if (!result.IsSuccessful())
+            {
+                ErrorMessage = string.Join(" ", result.Errors);
+                return;
+            }
+
+            EmployeeIdsPairs = result.EmployeeIdsWorkedTogether;
+            EmployeesPerProject = result.EmployeesPerProject;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error processing employee file");
+            ErrorMessage = "An unexpected error occurred while processing the file. Please try again.";
         }
     }
 
     private void ClearAll()
     {
         Input = new();
-        EmployeeIdsPairs = new List<KeyValuePair<int, int>>();
-        EmployeesPerProject = new List<EmployeesViewModel>();
+        EmployeeIdsPairs = [];
+        EmployeesPerProject = [];
         ErrorMessage = null;
     }
 }
