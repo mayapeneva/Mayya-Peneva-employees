@@ -40,7 +40,7 @@ namespace Mayya_Peneva_employees.Client.Core.Helpers.Converters
             }
 
             var dateToString = string.IsNullOrWhiteSpace(employeeInput.DateTo) || employeeInput.DateTo.Equals("null", StringComparison.OrdinalIgnoreCase)
-                ? DateOnly.FromDateTime(DateTime.UtcNow).ToString("dd-MM-yyyy")
+                ? DateOnly.FromDateTime(DateTime.UtcNow).ToString("yyyy-MM-dd")
                 : employeeInput.DateTo;
 
             var dateToResult = _dateParser.TryParseDate(dateToString, nameof(employeeInput.DateTo), employeeInput.Id);

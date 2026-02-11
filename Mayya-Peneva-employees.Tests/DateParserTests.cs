@@ -27,12 +27,12 @@ namespace Mayya_Peneva_employees.Tests
             var expectedDate = new DateOnly(expectedYear, expectedMonth, expectedDay);
 
             // Act
-            var result = _parser.TryParseDate(dateString, FieldName, EmployeeId);
+            var actualResult = _parser.TryParseDate(dateString, FieldName, EmployeeId);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.True(result.IsSuccessful());
-            Assert.Equal(expectedDate, result.ParsedDate);
+            Assert.NotNull(actualResult);
+            Assert.True(actualResult.IsSuccessful());
+            Assert.Equal(expectedDate, actualResult.ParsedDate);
         }
 
         [Theory]
@@ -43,12 +43,12 @@ namespace Mayya_Peneva_employees.Tests
         public void TryParse_ShouldReturnErrorWhenInvalidDates(string dateString)
         {
             // Act
-            var result = _parser.TryParseDate(dateString, FieldName, EmployeeId);
+            var actualResult = _parser.TryParseDate(dateString, FieldName, EmployeeId);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.False(result.IsSuccessful());
-            Assert.NotEmpty(result.Errors);
+            Assert.NotNull(actualResult);
+            Assert.False(actualResult.IsSuccessful());
+            Assert.NotEmpty(actualResult.Errors);
         }
     }
 }
