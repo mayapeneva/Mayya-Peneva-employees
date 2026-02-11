@@ -1,9 +1,9 @@
 ﻿namespace Mayya_Peneva_employees.Client.Core.Results
 {
-    public class BaseAppResult
+    public abstract class BaseAppResult
     {
         public ICollection<string> Errors { get; set; } = [];
 
-        public bool IsSuccessful() => this.Errors.Count == 0;
+        public bool IsSuccessful() => Errors.Count == 0;
     }
 }

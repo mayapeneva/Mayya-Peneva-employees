@@ -1,11 +1,13 @@
 ﻿@page "/"
 
+@inject IFileValidator FileValidator
+@inject IEmployeeConverter EmployeeConverter
 @inject IEmployeeService EmployeeService
 @inject ILogger<Home> Logger
 
 <PageTitle>Home</PageTitle>
 
-<div class="container mt-5" ">
+<div class="container mt-5">
     <div class="row mb-4">
         <div class="col-md-12">
             <h2>Employee Collaboration</h2>
@@ -26,10 +28,10 @@
 
                         <div class="form-group mb-3">
                             <label for="csvFile" class="form-label">Select CSV File:</label>
-                            <InputFile id="csvFile" class="form-control" OnChange="@LoadFile" accept=".csv" />
+                            <InputFile id="csvFile" class="form-control" OnChange="@LoadFile" accept=".csv"/>
                             <ValidationMessage For="() => Input!.CsvFile" class="text-danger small mt-1" />
                             <small class="text-muted d-block mt-2">
-                                Expected format: EmployeeID, ProjectID, DateFrom, DateTo
+                                Expected format: EmployeeID, ProjectID, DateFrom, DateTo (Max 5 MB)
                             </small>
                         </div>
 
@@ -122,7 +124,26 @@
     private void LoadFile(InputFileChangeEventArgs e)
     {
         Input!.CsvFile = e.GetMultipleFiles().FirstOrDefault();
-        ErrorMessage = null;
+        ErrorMessage = null;        
+
+        if (Input?.CsvFile == null)
+        {
+            ErrorMessage = "Please select a file first.";
+            return;
+        }
+
+        if (Input.CsvFile != null)
+        {
+            var validationResult = FileValidator.Validate(Input.CsvFile);
+            if (!validationResult.IsValid)
+            {
+                ErrorMessage = string.Join(", ", validationResult.Errors);
+                Input.CsvFile = null;
+                return;
+            }
+
+            Logger.LogInformation($"File validated successfully: {Input.CsvFile.Name} ({Input.CsvFile.Size} bytes)");
+        }
     }
 
     private async Task LoadEmployees()
@@ -133,8 +154,6 @@
             return;
         }
 
-        ErrorMessage = null;
-
         try
         {
             var employeeList = new List<Employee>();
@@ -144,7 +163,7 @@
             {
                 await foreach (var employeeInput in csv.GetRecordsAsync<EmployeeInput>())
                 {
-                    var employeeResult = employeeInput.ConvertToEmployee();
+                    var employeeResult = EmployeeConverter.ConvertEmployeeInput(employeeInput);
                     if (!employeeResult.IsSuccessful())
                     {
                         ErrorMessage = "Note: There was some wrong data in the submitted file.";
