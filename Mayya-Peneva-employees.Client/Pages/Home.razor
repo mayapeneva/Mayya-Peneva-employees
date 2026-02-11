@@ -1,6 +1,5 @@
 ﻿@page "/"
 
-@inject IFileValidator FileValidator
 @inject IEmployeeConverter EmployeeConverter
 @inject IEmployeeService EmployeeService
 @inject ILogger<Home> Logger
@@ -125,25 +124,6 @@
     {
         Input!.CsvFile = e.GetMultipleFiles().FirstOrDefault();
         ErrorMessage = null;
-
-        if (Input?.CsvFile == null)
-        {
-            ErrorMessage = "Please select a file first.";
-            return;
-        }
-
-        if (Input.CsvFile != null)
-        {
-            var validationResult = FileValidator.Validate(Input.CsvFile);
-            if (!validationResult.IsValid)
-            {
-                ErrorMessage = string.Join(", ", validationResult.Errors);
-                Input.CsvFile = null;
-                return;
-            }
-
-            Logger.LogInformation($"File validated successfully: {Input.CsvFile.Name} ({Input.CsvFile.Size} bytes)");
-        }
     }
 
     private async Task LoadEmployees()

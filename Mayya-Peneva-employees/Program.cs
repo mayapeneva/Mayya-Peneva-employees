@@ -1,3 +1,6 @@
+using Mayya_Peneva_employees.Client.Core.Helpers.Converters;
+using Mayya_Peneva_employees.Client.Core.Helpers.Parsers;
+using Mayya_Peneva_employees.Client.Core.Services;
 using Mayya_Peneva_employees.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +9,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
+
+builder.Services.AddScoped<IDateParser, DateParser>();
+builder.Services.AddScoped<IEmployeeConverter, EmployeeConverter>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+
 
 var app = builder.Build();
 
