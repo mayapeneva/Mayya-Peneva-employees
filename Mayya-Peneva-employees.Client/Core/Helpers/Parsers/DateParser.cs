@@ -7,16 +7,23 @@ namespace Mayya_Peneva_employees.Client.Core.Helpers.Parsers
     {
         private static readonly string[] SupportedDateFormats = new[]
         {
-            "yyyy-MM-dd",           // 2020-01-15
-            "dd/MM/yyyy",           // 15/01/2020
-            "MM/dd/yyyy",           // 01/15/2020
-            "dd.MM.yyyy",           // 15.01.2020
-            "yyyy/MM/dd",           // 2020/01/15
-            "dd-MM-yyyy",           // 15-01-2020
-            "M/d/yyyy",             // 1/5/2020
-            "d/M/yyyy",             // 5/1/2020
-            "MMM dd, yyyy",         // Jan 15, 2020
-            "dd MMM yyyy"           // 15 Jan 2020
+            "M/d/yyyy", "MM/dd/yyyy", "d/M/yyyy", "dd/MM/yyyy", "yyyy/M/d", "yyyy/MM/dd",
+            "M/d/yy", "MM/dd/yy", "d/M/yy", "dd/MM/yy", "yy/M/d", "yy/MM/dd",
+            "M-d-yyyy", "MM-dd-yyyy", "d-M-yyyy", "dd-MM-yyyy", "yyyy-M-d", "yyyy-MM-dd",
+            "M-d-yy", "MM-dd-yy", "d-M-yy", "dd-MM-yy", "yy-M-d", "yy-MM-dd",
+            "M.d.yyyy", "MM.dd.yyyy", "d.M.yyyy", "dd.MM.yyyy", "yyyy.M.d", "yyyy.MM.dd",
+            "M.d.yy", "MM.dd.yy", "d.M.yy", "dd.MM.yy", "yy.M.d", "yy.MM.dd",
+            "M,d,yyyy", "MM,dd,yyyy", "d,M,yyyy", "dd,MM,yyyy", "yyyy,M,d", "yyyy,MM,dd",
+            "M,d,yy", "MM,dd,yy", "d,M,yy", "dd,MM,yy", "yy,M,d", "yy,MM,dd",
+            "M d yyyy", "MM dd yyyy", "d M yyyy", "dd MM yyyy", "yyyy M d", "yyyy MM dd",
+            "M d yy", "MM dd yy", "d M yy", "dd MM yy", "yy M d", "yy MM dd",
+            "d-MMM-yyyy", "d/MMM/yyyy", "d MMM yyyy", "d.MMM.yyyy",
+            "d-MMM-yy", "d/MMM/yy", "d MMM yy", "d.MMM.yy",
+            "d-MMM-y", "d/MMM/y", "d MMM y", "d.MMM.y",
+            "dd-MMM-yyyy", "dd/MMM/yyyy", "dd MMM yyyy", "dd.MMM.yyyy",
+            "dd-MMM-yy", "dd/MMM/yy", "dd MMM yy", "dd.MMM.yy",
+            "MMM/dd/yyyy", "MMM-dd-yyyy", "MMM dd yyyy", "MMM.dd.yyyy", "MMM.dd.yyyy",
+            "MMM/dd/yy", "MMM-dd-yy", "MMM dd yy", "MMM.dd.yy", "MMM.dd.yy"
         };
 
         public DateParseResult TryParseDate(string dateString, string fieldName, int employeeId)
@@ -30,14 +37,6 @@ namespace Mayya_Peneva_employees.Client.Core.Helpers.Parsers
             }
 
             var trimmedDate = dateString.Trim();
-
-            var dateTimeFormatInfo = new DateTimeFormatInfo();
-            var allDateTimePatterns = dateTimeFormatInfo.GetAllDateTimePatterns();
-            if (DateOnly.TryParseExact(trimmedDate, allDateTimePatterns, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedDate))
-            {
-                result.ParsedDate = parsedDate;
-                return result;
-            }
 
             foreach (var format in SupportedDateFormats)
             {
