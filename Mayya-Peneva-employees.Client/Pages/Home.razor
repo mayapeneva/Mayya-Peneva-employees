@@ -28,7 +28,7 @@
 
                         <div class="form-group mb-3">
                             <label for="csvFile" class="form-label">Select CSV File:</label>
-                            <InputFile id="csvFile" class="form-control" OnChange="@LoadFile" accept=".csv"/>
+                            <InputFile id="csvFile" class="form-control" OnChange="@LoadFile" accept=".csv" />
                             <ValidationMessage For="() => Input!.CsvFile" class="text-danger small mt-1" />
                             <small class="text-muted d-block mt-2">
                                 Expected format: EmployeeID, ProjectID, DateFrom, DateTo (Max 5 MB)
@@ -124,7 +124,7 @@
     private void LoadFile(InputFileChangeEventArgs e)
     {
         Input!.CsvFile = e.GetMultipleFiles().FirstOrDefault();
-        ErrorMessage = null;        
+        ErrorMessage = null;
 
         if (Input?.CsvFile == null)
         {

@@ -5,6 +5,20 @@ namespace Mayya_Peneva_employees.Client.Core.Helpers.Parsers
 {
     public class DateParser : IDateParser
     {
+        private static readonly string[] SupportedDateFormats = new[]
+        {
+            "yyyy-MM-dd",           // 2020-01-15
+            "dd/MM/yyyy",           // 15/01/2020
+            "MM/dd/yyyy",           // 01/15/2020
+            "dd.MM.yyyy",           // 15.01.2020
+            "yyyy/MM/dd",           // 2020/01/15
+            "dd-MM-yyyy",           // 15-01-2020
+            "M/d/yyyy",             // 1/5/2020
+            "d/M/yyyy",             // 5/1/2020
+            "MMM dd, yyyy",         // Jan 15, 2020
+            "dd MMM yyyy"           // 15 Jan 2020
+        };
+
         public DateParseResult TryParseDate(string dateString, string fieldName, int employeeId)
         {
             var result = new DateParseResult();
@@ -23,6 +37,15 @@ namespace Mayya_Peneva_employees.Client.Core.Helpers.Parsers
             {
                 result.ParsedDate = parsedDate;
                 return result;
+            }
+
+            foreach (var format in SupportedDateFormats)
+            {
+                if (DateOnly.TryParseExact(trimmedDate, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out var supportedParsedDate))
+                {
+                    result.ParsedDate = supportedParsedDate;
+                    return result;
+                }
             }
 
             if (DateOnly.TryParse(trimmedDate, CultureInfo.InvariantCulture, DateTimeStyles.None, out var defaultDate))

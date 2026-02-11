@@ -23,6 +23,7 @@ namespace Mayya_Peneva_employees.Tests
 
             // Assert
             Assert.NotNull(actualResult);
+            Assert.NotEmpty(actualResult.Errors);
             Assert.Empty(actualResult.EmployeesPerProject);
             Assert.Empty(actualResult.EmployeeIdsWorkedTogether);
         }
@@ -41,6 +42,7 @@ namespace Mayya_Peneva_employees.Tests
 
             // Assert
             Assert.NotNull(actualResult);
+            Assert.NotEmpty(actualResult.Errors);
             Assert.Empty(actualResult.EmployeesPerProject);
             Assert.Empty(actualResult.EmployeeIdsWorkedTogether);
         }
@@ -60,6 +62,7 @@ namespace Mayya_Peneva_employees.Tests
 
             // Assert
             Assert.NotNull(actualResult);
+            Assert.NotEmpty(actualResult.Errors);
             Assert.Empty(actualResult.EmployeesPerProject);
             Assert.Empty(actualResult.EmployeeIdsWorkedTogether);
         }
@@ -80,6 +83,7 @@ namespace Mayya_Peneva_employees.Tests
 
             // Assert
             Assert.NotNull(actualResult);
+            Assert.Empty(actualResult.Errors);
             Assert.Single(actualResult.EmployeesPerProject);
             Assert.Single(actualResult.EmployeeIdsWorkedTogether);
 
@@ -111,6 +115,7 @@ namespace Mayya_Peneva_employees.Tests
 
             // Assert
             Assert.NotNull(actualResult);
+            Assert.Empty(actualResult.Errors);
             Assert.Single(actualResult.EmployeesPerProject);
             Assert.Single(actualResult.EmployeeIdsWorkedTogether);
 
@@ -143,6 +148,7 @@ namespace Mayya_Peneva_employees.Tests
 
             // Assert
             Assert.NotNull(actualResult);
+            Assert.Empty(actualResult.Errors);
             Assert.Single(actualResult.EmployeesPerProject);
             Assert.Single(actualResult.EmployeeIdsWorkedTogether);
 
@@ -173,6 +179,7 @@ namespace Mayya_Peneva_employees.Tests
 
             // Assert
             Assert.NotNull(actualResult);
+            Assert.Empty(actualResult.Errors);
             Assert.Single(actualResult.EmployeesPerProject);
             Assert.Single(actualResult.EmployeeIdsWorkedTogether);
 
@@ -204,6 +211,7 @@ namespace Mayya_Peneva_employees.Tests
 
             // Assert
             Assert.NotNull(actualResult);
+            Assert.Empty(actualResult.Errors);
             Assert.Equal(3, actualResult.EmployeesPerProject.Count());
             Assert.Equal(3, actualResult.EmployeeIdsWorkedTogether.Count());
 
@@ -234,6 +242,7 @@ namespace Mayya_Peneva_employees.Tests
 
             // Assert
             Assert.NotNull(actualResult);
+            Assert.Empty(actualResult.Errors);
             Assert.Single(actualResult.EmployeesPerProject);
             Assert.Single(actualResult.EmployeeIdsWorkedTogether);
 
@@ -263,6 +272,7 @@ namespace Mayya_Peneva_employees.Tests
 
             // Assert
             Assert.NotNull(actualResult);
+            Assert.Empty(actualResult.Errors);
             Assert.Single(actualResult.EmployeesPerProject);
             Assert.Single(actualResult.EmployeeIdsWorkedTogether);
 
@@ -300,6 +310,7 @@ namespace Mayya_Peneva_employees.Tests
 
             // Assert
             Assert.NotNull(actualResult);
+            Assert.Empty(actualResult.Errors);
             Assert.Equal(totalNumberOfCombinations, actualResult.EmployeesPerProject.Count());
             Assert.Equal(totalNumberOfCombinations, actualResult.EmployeeIdsWorkedTogether.Count());
         }
@@ -320,6 +331,7 @@ namespace Mayya_Peneva_employees.Tests
 
             // Assert
             Assert.NotNull(actualResult);
+            Assert.Empty(actualResult.Errors);
             Assert.Single(actualResult.EmployeesPerProject);
             Assert.Single(actualResult.EmployeeIdsWorkedTogether);
 
@@ -353,6 +365,7 @@ namespace Mayya_Peneva_employees.Tests
 
             // Assert
             Assert.NotNull(actualResult);
+            Assert.Empty(actualResult.Errors);
             Assert.Single(actualResult.EmployeesPerProject);
             Assert.Single(actualResult.EmployeeIdsWorkedTogether);
 
