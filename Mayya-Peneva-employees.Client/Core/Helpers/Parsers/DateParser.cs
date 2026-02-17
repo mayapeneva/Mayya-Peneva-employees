@@ -5,27 +5,6 @@ namespace Mayya_Peneva_employees.Client.Core.Helpers.Parsers
 {
     public class DateParser : IDateParser
     {
-        private static readonly string[] SupportedDateFormats = new[]
-        {
-            "M/d/yyyy", "MM/dd/yyyy", "d/M/yyyy", "dd/MM/yyyy", "yyyy/M/d", "yyyy/MM/dd",
-            "M/d/yy", "MM/dd/yy", "d/M/yy", "dd/MM/yy", "yy/M/d", "yy/MM/dd",
-            "M-d-yyyy", "MM-dd-yyyy", "d-M-yyyy", "dd-MM-yyyy", "yyyy-M-d", "yyyy-MM-dd",
-            "M-d-yy", "MM-dd-yy", "d-M-yy", "dd-MM-yy", "yy-M-d", "yy-MM-dd",
-            "M.d.yyyy", "MM.dd.yyyy", "d.M.yyyy", "dd.MM.yyyy", "yyyy.M.d", "yyyy.MM.dd",
-            "M.d.yy", "MM.dd.yy", "d.M.yy", "dd.MM.yy", "yy.M.d", "yy.MM.dd",
-            "M,d,yyyy", "MM,dd,yyyy", "d,M,yyyy", "dd,MM,yyyy", "yyyy,M,d", "yyyy,MM,dd",
-            "M,d,yy", "MM,dd,yy", "d,M,yy", "dd,MM,yy", "yy,M,d", "yy,MM,dd",
-            "M d yyyy", "MM dd yyyy", "d M yyyy", "dd MM yyyy", "yyyy M d", "yyyy MM dd",
-            "M d yy", "MM dd yy", "d M yy", "dd MM yy", "yy M d", "yy MM dd",
-            "d-MMM-yyyy", "d/MMM/yyyy", "d MMM yyyy", "d.MMM.yyyy",
-            "d-MMM-yy", "d/MMM/yy", "d MMM yy", "d.MMM.yy",
-            "d-MMM-y", "d/MMM/y", "d MMM y", "d.MMM.y",
-            "dd-MMM-yyyy", "dd/MMM/yyyy", "dd MMM yyyy", "dd.MMM.yyyy",
-            "dd-MMM-yy", "dd/MMM/yy", "dd MMM yy", "dd.MMM.yy",
-            "MMM/dd/yyyy", "MMM-dd-yyyy", "MMM dd yyyy", "MMM.dd.yyyy", "MMM.dd.yyyy",
-            "MMM/dd/yy", "MMM-dd-yy", "MMM dd yy", "MMM.dd.yy", "MMM.dd.yy"
-        };
-
         public DateParseResult TryParseDate(string dateString, string fieldName, int employeeId)
         {
             var result = new DateParseResult();
@@ -38,13 +17,11 @@ namespace Mayya_Peneva_employees.Client.Core.Helpers.Parsers
 
             var trimmedDate = dateString.Trim();
 
-            foreach (var format in SupportedDateFormats)
+            var globalDateFormats = GetGlobalDateFormats().ToArray();
+            if (DateOnly.TryParseExact(trimmedDate, globalDateFormats, CultureInfo.InvariantCulture, DateTimeStyles.None, out var parsedDate))
             {
-                if (DateOnly.TryParseExact(trimmedDate, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out var supportedParsedDate))
-                {
-                    result.ParsedDate = supportedParsedDate;
-                    return result;
-                }
+                result.ParsedDate = parsedDate;
+                return result;
             }
 
             if (DateOnly.TryParse(trimmedDate, CultureInfo.InvariantCulture, DateTimeStyles.None, out var defaultDate))
@@ -56,5 +33,22 @@ namespace Mayya_Peneva_employees.Client.Core.Helpers.Parsers
             result.Errors.Add($"Invalid date format '{trimmedDate}' for employee with Id {employeeId}. Please provide a valid {fieldName}.");
             return result;
         }
+
+        private IEnumerable<string> GetGlobalDateFormats()
+        {
+            var allCultures = CultureInfo.GetCultures(CultureTypes.SpecificCultures);
+            string[] priorityCultureNames = { "en-GB", "de-DE", "fr-FR", "en-BG" };
+
+            var priorityCultures = allCultures.Where(c => priorityCultureNames.Contains(c.Name));
+            var otherCultures = allCultures.Where(c => !priorityCultureNames.Contains(c.Name));
+
+            return GetPatterns(priorityCultures)
+                .Concat(GetPatterns(otherCultures))
+                .Distinct();
+        }
+
+        private IEnumerable<string> GetPatterns(IEnumerable<CultureInfo> cultures) =>
+                        cultures.SelectMany(c => c.DateTimeFormat.GetAllDateTimePatterns('d'))
+                               .Concat(cultures.SelectMany(c => c.DateTimeFormat.GetAllDateTimePatterns('D')));
     }
 }
