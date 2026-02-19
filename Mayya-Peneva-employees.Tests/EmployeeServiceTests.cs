@@ -25,7 +25,6 @@ namespace Mayya_Peneva_employees.Tests
             Assert.NotNull(actualResult);
             Assert.NotEmpty(actualResult.Errors);
             Assert.Empty(actualResult.EmployeesPerProject);
-            Assert.Empty(actualResult.EmployeeIdsWorkedTogether);
         }
 
         [Fact]
@@ -44,7 +43,6 @@ namespace Mayya_Peneva_employees.Tests
             Assert.NotNull(actualResult);
             Assert.NotEmpty(actualResult.Errors);
             Assert.Empty(actualResult.EmployeesPerProject);
-            Assert.Empty(actualResult.EmployeeIdsWorkedTogether);
         }
 
         [Fact]
@@ -64,7 +62,6 @@ namespace Mayya_Peneva_employees.Tests
             Assert.NotNull(actualResult);
             Assert.NotEmpty(actualResult.Errors);
             Assert.Empty(actualResult.EmployeesPerProject);
-            Assert.Empty(actualResult.EmployeeIdsWorkedTogether);
         }
 
         [Fact]
@@ -85,11 +82,6 @@ namespace Mayya_Peneva_employees.Tests
             Assert.NotNull(actualResult);
             Assert.Empty(actualResult.Errors);
             Assert.Single(actualResult.EmployeesPerProject);
-            Assert.Single(actualResult.EmployeeIdsWorkedTogether);
-
-            var employeeIdsPair = actualResult.EmployeeIdsWorkedTogether.First();
-            Assert.Equal(1, employeeIdsPair.Key);
-            Assert.Equal(2, employeeIdsPair.Value);
 
             var employeePair = actualResult.EmployeesPerProject.First();
             Assert.Equal(1, employeePair.EmployeeOneId);
@@ -117,11 +109,6 @@ namespace Mayya_Peneva_employees.Tests
             Assert.NotNull(actualResult);
             Assert.Empty(actualResult.Errors);
             Assert.Single(actualResult.EmployeesPerProject);
-            Assert.Single(actualResult.EmployeeIdsWorkedTogether);
-
-            var employeeIdsPair = actualResult.EmployeeIdsWorkedTogether.First();
-            Assert.Equal(1, employeeIdsPair.Key);
-            Assert.Equal(2, employeeIdsPair.Value);
 
             var employeePair = actualResult.EmployeesPerProject.First();
             Assert.Equal(1, employeePair.EmployeeOneId);
@@ -150,11 +137,6 @@ namespace Mayya_Peneva_employees.Tests
             Assert.NotNull(actualResult);
             Assert.Empty(actualResult.Errors);
             Assert.Single(actualResult.EmployeesPerProject);
-            Assert.Single(actualResult.EmployeeIdsWorkedTogether);
-
-            var employeeIdsPair = actualResult.EmployeeIdsWorkedTogether.First();
-            Assert.Equal(1, employeeIdsPair.Key);
-            Assert.Equal(2, employeeIdsPair.Value);
 
             var employeePair = actualResult.EmployeesPerProject.First();
             Assert.Equal(1, employeePair.EmployeeOneId);
@@ -181,11 +163,6 @@ namespace Mayya_Peneva_employees.Tests
             Assert.NotNull(actualResult);
             Assert.Empty(actualResult.Errors);
             Assert.Single(actualResult.EmployeesPerProject);
-            Assert.Single(actualResult.EmployeeIdsWorkedTogether);
-
-            var employeeIdsPair = actualResult.EmployeeIdsWorkedTogether.First();
-            Assert.Equal(1, employeeIdsPair.Key);
-            Assert.Equal(2, employeeIdsPair.Value);
 
             var employeePair = actualResult.EmployeesPerProject.First();
             Assert.Equal(1, employeePair.EmployeeOneId);
@@ -213,11 +190,6 @@ namespace Mayya_Peneva_employees.Tests
             Assert.NotNull(actualResult);
             Assert.Empty(actualResult.Errors);
             Assert.Equal(3, actualResult.EmployeesPerProject.Count());
-            Assert.Equal(3, actualResult.EmployeeIdsWorkedTogether.Count());
-
-            var employeeIdsPair = actualResult.EmployeeIdsWorkedTogether.First();
-            Assert.Equal(1, employeeIdsPair.Key);
-            Assert.Equal(2, employeeIdsPair.Value);
 
             var employeePair = actualResult.EmployeesPerProject.First();
             Assert.Equal(1, employeePair.EmployeeOneId);
@@ -244,11 +216,6 @@ namespace Mayya_Peneva_employees.Tests
             Assert.NotNull(actualResult);
             Assert.Empty(actualResult.Errors);
             Assert.Single(actualResult.EmployeesPerProject);
-            Assert.Single(actualResult.EmployeeIdsWorkedTogether);
-
-            var employeeIdsPair = actualResult.EmployeeIdsWorkedTogether.First();
-            Assert.Equal(1, employeeIdsPair.Key);
-            Assert.Equal(2, employeeIdsPair.Value);
 
             var employeePair = actualResult.EmployeesPerProject.First();
             Assert.Equal(1, employeePair.EmployeeOneId);
@@ -274,11 +241,6 @@ namespace Mayya_Peneva_employees.Tests
             Assert.NotNull(actualResult);
             Assert.Empty(actualResult.Errors);
             Assert.Single(actualResult.EmployeesPerProject);
-            Assert.Single(actualResult.EmployeeIdsWorkedTogether);
-
-            var employeeIdsPair = actualResult.EmployeeIdsWorkedTogether.First();
-            Assert.Equal(1, employeeIdsPair.Key);
-            Assert.Equal(2, employeeIdsPair.Value);
 
             var employeePair = actualResult.EmployeesPerProject.First();
             Assert.Equal(1, employeePair.EmployeeOneId);
@@ -312,7 +274,6 @@ namespace Mayya_Peneva_employees.Tests
             Assert.NotNull(actualResult);
             Assert.Empty(actualResult.Errors);
             Assert.Equal(totalNumberOfCombinations, actualResult.EmployeesPerProject.Count());
-            Assert.Equal(totalNumberOfCombinations, actualResult.EmployeeIdsWorkedTogether.Count());
         }
 
         [Fact]
@@ -333,11 +294,6 @@ namespace Mayya_Peneva_employees.Tests
             Assert.NotNull(actualResult);
             Assert.Empty(actualResult.Errors);
             Assert.Single(actualResult.EmployeesPerProject);
-            Assert.Single(actualResult.EmployeeIdsWorkedTogether);
-
-            var employeeIdsPair = actualResult.EmployeeIdsWorkedTogether.First();
-            Assert.Equal(1, employeeIdsPair.Key);
-            Assert.Equal(2, employeeIdsPair.Value);
 
             var employeePair = actualResult.EmployeesPerProject.First();
             Assert.Equal(1, employeePair.EmployeeOneId);
@@ -367,11 +323,6 @@ namespace Mayya_Peneva_employees.Tests
             Assert.NotNull(actualResult);
             Assert.Empty(actualResult.Errors);
             Assert.Single(actualResult.EmployeesPerProject);
-            Assert.Single(actualResult.EmployeeIdsWorkedTogether);
-
-            var employeeIdsPair = actualResult.EmployeeIdsWorkedTogether.First();
-            Assert.Equal(4, employeeIdsPair.Key);
-            Assert.Equal(5, employeeIdsPair.Value);
 
             var employeePair = actualResult.EmployeesPerProject.First();
             Assert.Equal(4, employeePair.EmployeeOneId);

@@ -5,6 +5,6 @@ namespace Mayya_Peneva_employees.Client.Core.Services
 {
     public interface IEmployeeService
     {
-        EmploeeysResult GetPairEmployeesWorkedLongest(IEnumerable<Employee> employees);
+        EmployeesResult GetPairEmployeesWorkedLongest(IEnumerable<Employee> employees);
     }
 }

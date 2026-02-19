@@ -169,8 +169,8 @@
                 return;
             }
 
-            EmployeeIdsPairs = result.EmployeeIdsWorkedTogether;
             EmployeesPerProject = result.EmployeesPerProject;
+            EmployeeIdsPairs = result.EmployeesPerProject.Select(ep => new KeyValuePair<int, int>(ep.EmployeeOneId, ep.EmployeeTwoId));
         }
         catch (Exception ex)
         {

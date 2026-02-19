@@ -6,9 +6,9 @@ namespace Mayya_Peneva_employees.Client.Core.Services
 {
     public class EmployeeService : IEmployeeService
     {
-        public EmploeeysResult GetPairEmployeesWorkedLongest(IEnumerable<Employee> employees)
+        public EmployeesResult GetPairEmployeesWorkedLongest(IEnumerable<Employee> employees)
         {
-            var result = new EmploeeysResult();
+            var result = new EmployeesResult();
 
             var projectGroups = employees.GroupBy(e => e.ProjectId).ToArray();
             if (projectGroups.Length == 0)
@@ -26,15 +26,18 @@ namespace Mayya_Peneva_employees.Client.Core.Services
                 {
                     for (int j = i + 1; j < projectEmployees.Length; j++)
                     {
+                        var employeeOne = projectEmployees[i];
+                        var employeeTwo = projectEmployees[j];
+
                         var daysWorked = CalculateOverlapDays(
-                            projectEmployees[i].DateFrom,
-                            projectEmployees[i].DateTo,
-                            projectEmployees[j].DateFrom,
-                            projectEmployees[j].DateTo);
+                            employeeOne.DateFrom,
+                            employeeOne.DateTo,
+                            employeeTwo.DateFrom,
+                            employeeTwo.DateTo);
 
                         if (daysWorked > 0)
                         {
-                            allEmployeePairs.Add((projectEmployees[i].Id, projectEmployees[j].Id, projectGroup.Key, daysWorked));
+                            allEmployeePairs.Add((employeeOne.Id, employeeTwo.Id, projectGroup.Key, daysWorked));
                             maxDaysWorkedTogether = Math.Max(maxDaysWorkedTogether, daysWorked);
                         }
                     }
@@ -50,10 +53,6 @@ namespace Mayya_Peneva_employees.Client.Core.Services
             var maxDaysWorkedEmployeePairs = allEmployeePairs
                 .Where(p => p.DaysWorked == maxDaysWorkedTogether)
                 .ToList();
-
-            result.EmployeeIdsWorkedTogether = maxDaysWorkedEmployeePairs
-                .Select(p => new KeyValuePair<int, int>(p.EmployeeOneId, p.EmployeeTwoId))
-                .Distinct();
 
             result.EmployeesPerProject = maxDaysWorkedEmployeePairs
                 .Select(p => new EmployeesViewModel
