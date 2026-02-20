@@ -184,7 +184,7 @@
             }
 
             EmployeesPerProject = employeeServiceResult.EmployeesPerProject;
-            EmployeeIdsPairs = employeeServiceResult.EmployeesPerProject.Select(ep => new KeyValuePair<int, int>(ep.EmployeeOneId, ep.EmployeeTwoId));
+            EmployeeIdsPairs = employeeServiceResult.EmployeesPerProject.Select(ep => new KeyValuePair<int, int>(ep.EmployeeOneId, ep.EmployeeTwoId)).Distinct();
         }
         catch (IOException ex) when (ex.Message.Contains("exceeds the maximum allow size"))
         {
