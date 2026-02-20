@@ -106,6 +106,8 @@
 </div>
 
 @code {
+    private const long MaxFileSize = 5 * 1024 * 1024;
+
     [SupplyParameterFromForm]
     private FileInputModel? Input { get; set; }
 
@@ -136,41 +138,57 @@
 
         try
         {
-            var employeeList = new List<Employee>();
+            var hasError = false;
+            var employeesGroupsPerProject = new Dictionary<int, List<Employee>>();
 
-            using (var reader = new StreamReader(Input.CsvFile.OpenReadStream()))
+            using (var reader = new StreamReader(Input.CsvFile.OpenReadStream(MaxFileSize)))
             using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
                 await foreach (var employeeInput in csv.GetRecordsAsync<EmployeeInput>())
                 {
-                    var employeeResult = EmployeeConverter.ConvertEmployeeInput(employeeInput);
-                    if (!employeeResult.IsSuccessful())
+                    var employeeConverterResult = EmployeeConverter.ConvertEmployeeInput(employeeInput);
+                    if (!employeeConverterResult.IsSuccessful())
                     {
-                        ErrorMessage = "Note: There was some wrong data in the submitted file.";
-                        foreach (var error in employeeResult.Errors)
+                        foreach (var error in employeeConverterResult.Errors)
                             Logger.LogWarning(error);
+                        hasError = true;
                         continue;
                     }
 
-                    employeeList.Add(employeeResult.Employee!);
+                    var employee = employeeConverterResult.Employee!;
+                    if (!employeesGroupsPerProject.TryGetValue(employee.ProjectId, out var group))
+                    {
+                        group = [];
+                        employeesGroupsPerProject[employee.ProjectId] = group;
+                    }
+
+                    group.Add(employee);
                 }
             }
 
-            if (employeeList.Count == 0)
+            if (employeesGroupsPerProject.Count == 0)
             {
                 ErrorMessage = "No valid employee records found in the file.";
                 return;
             }
-
-            var result = EmployeeService.GetPairEmployeesWorkedLongest(employeeList);
-            if (!result.IsSuccessful())
+            else if (hasError)
             {
-                ErrorMessage = string.Join(" ", result.Errors);
+                ErrorMessage = "Note: There was some wrong data in the submitted file.";
+            }
+
+            var employeeServiceResult = EmployeeService.GetPairEmployeesWorkedLongest(employeesGroupsPerProject);
+            if (!employeeServiceResult.IsSuccessful())
+            {
+                ErrorMessage = string.Join(" ", employeeServiceResult.Errors);
                 return;
             }
 
-            EmployeesPerProject = result.EmployeesPerProject;
-            EmployeeIdsPairs = result.EmployeesPerProject.Select(ep => new KeyValuePair<int, int>(ep.EmployeeOneId, ep.EmployeeTwoId));
+            EmployeesPerProject = employeeServiceResult.EmployeesPerProject;
+            EmployeeIdsPairs = employeeServiceResult.EmployeesPerProject.Select(ep => new KeyValuePair<int, int>(ep.EmployeeOneId, ep.EmployeeTwoId));
+        }
+        catch (IOException ex) when (ex.Message.Contains("exceeds the maximum allow size"))
+        {
+            ErrorMessage = "The uploaded file is too large. Please upload a file smaller than 5MB.";
         }
         catch (Exception ex)
         {

@@ -16,7 +16,7 @@ namespace Mayya_Peneva_employees.Tests
         public void GetPairEmployeesWorkedLongest_ShouldReturnEmptyResultWhenNoEmployees()
         {
             // Arrange
-            var employees = new List<Employee>();
+            var employees = new Dictionary<int, List<Employee>>();
 
             // Act
             var actualResult = _service.GetPairEmployeesWorkedLongest(employees);
@@ -31,9 +31,9 @@ namespace Mayya_Peneva_employees.Tests
         public void GetPairEmployeesWorkedLongest_ShouldReturnEmptyResultWhenOneEmployeeOnly()
         {
             // Arrange
-            var employees = new List<Employee>
+            var employees = new Dictionary<int, List<Employee>>
             {
-                new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 12, 31) }
+                [1] = [new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 12, 31) }]
             };
 
             // Act
@@ -49,10 +49,12 @@ namespace Mayya_Peneva_employees.Tests
         public void GetPairEmployeesWorkedLongest_ShouldReturnEmptyResultWhenNoOverlap()
         {
             // Arrange
-            var employees = new List<Employee>
+
+            var employees = new Dictionary<int, List<Employee>>
             {
-                new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 6, 30) },
-                new Employee { Id = 2, ProjectId = 1, DateFrom = new DateOnly(2020, 7, 1), DateTo = new DateOnly(2020, 12, 31) }
+                [1] =
+                [new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 6, 30) },
+                new Employee { Id = 2, ProjectId = 1, DateFrom = new DateOnly(2020, 7, 1), DateTo = new DateOnly(2020, 12, 31) }]
             };
 
             // Act
@@ -68,10 +70,11 @@ namespace Mayya_Peneva_employees.Tests
         public void GetPairEmployeesWorkedLongest_ShouldReturnCorrectResultWhenOneOverlap()
         {
             // Arrange
-            var employees = new List<Employee>
+            var employees = new Dictionary<int, List<Employee>>
             {
-                new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 12, 31) },
-                new Employee { Id = 2, ProjectId = 1, DateFrom = new DateOnly(2020, 6, 1), DateTo = new DateOnly(2020, 12, 31) }
+                [1] =
+                [new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 12, 31) },
+                new Employee { Id = 2, ProjectId = 1, DateFrom = new DateOnly(2020, 6, 1), DateTo = new DateOnly(2020, 12, 31) }]
             };
             var actualDaysWorked = 214;
 
@@ -94,11 +97,12 @@ namespace Mayya_Peneva_employees.Tests
         public void GetPairEmployeesWorkedLongest_ShouldReturnCorrectResultWhenMoreOverlaps()
         {
             // Arrange
-            var employees = new List<Employee>
+            var employees = new Dictionary<int, List<Employee>>
             {
-                new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 12, 31) },
+                [1] =
+                [new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 12, 31) },
                 new Employee { Id = 2, ProjectId = 1, DateFrom = new DateOnly(2020, 6, 1), DateTo = new DateOnly(2020, 12, 31) },
-                new Employee { Id = 3, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 3, 31) }
+                new Employee { Id = 3, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 3, 31) }]
             };
             var actualDaysWorked = 214;
 
@@ -121,12 +125,14 @@ namespace Mayya_Peneva_employees.Tests
         public void GetPairEmployeesWorkedLongest_ShouldReturnCorrectResultWhenMoreProjects()
         {
             // Arrange
-            var employees = new List<Employee>
+            var employees = new Dictionary<int, List<Employee>>
             {
-                new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 12, 31) },
-                new Employee { Id = 2, ProjectId = 1, DateFrom = new DateOnly(2020, 6, 1), DateTo = new DateOnly(2020, 12, 31) },
-                new Employee { Id = 3, ProjectId = 2, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 12, 31) },
-                new Employee { Id = 4, ProjectId = 2, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 3, 31) }
+                [1] =
+                [new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 12, 31) },
+                new Employee { Id = 2, ProjectId = 1, DateFrom = new DateOnly(2020, 6, 1), DateTo = new DateOnly(2020, 12, 31) }],
+                [2] =
+                [new Employee { Id = 3, ProjectId = 2, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 12, 31) },
+                new Employee { Id = 4, ProjectId = 2, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 3, 31) }]
             };
             var actualDaysWorked = 214;
 
@@ -149,10 +155,11 @@ namespace Mayya_Peneva_employees.Tests
         public void GetPairEmployeesWorkedLongest_ShouldReturnCorrectResultWhenPartialOverlap()
         {
             // Arrange
-            var employees = new List<Employee>
+            var employees = new Dictionary<int, List<Employee>>
             {
-                new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 6, 30) },
-                new Employee { Id = 2, ProjectId = 1, DateFrom = new DateOnly(2020, 5, 1), DateTo = new DateOnly(2020, 8, 31) }
+                [1] =
+                [new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 6, 30) },
+                new Employee { Id = 2, ProjectId = 1, DateFrom = new DateOnly(2020, 5, 1), DateTo = new DateOnly(2020, 8, 31) }]
             };
             var actualDaysWorked = 61;
 
@@ -175,11 +182,12 @@ namespace Mayya_Peneva_employees.Tests
         public void GetPairEmployeesWorkedLongest_ShouldReturnAllValidPairsWhenMoreEmployeesSameProjectSameLenght()
         {
             // Arrange
-            var employees = new List<Employee>
+            var employees = new Dictionary<int, List<Employee>>
             {
-                new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 12, 31) },
+                [1] =
+                [new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 12, 31) },
                 new Employee { Id = 2, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 12, 31) },
-                new Employee { Id = 3, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 12, 31) }
+                new Employee { Id = 3, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 12, 31) }]
             };
             var actualDaysWorked = 366;
 
@@ -202,10 +210,11 @@ namespace Mayya_Peneva_employees.Tests
         public void GetPairEmployeesWorkedLongest_ShouldReturnCorrectResultWhenIdenticalDateRanges()
         {
             // Arrange
-            var employees = new List<Employee>
+            var employees = new Dictionary<int, List<Employee>>
             {
-                new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 12, 31) },
-                new Employee { Id = 2, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 12, 31) }
+                [1] =
+                [new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 12, 31) },
+                new Employee { Id = 2, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 12, 31) }]
             };
             var actualDaysWorked = 366;
 
@@ -228,10 +237,11 @@ namespace Mayya_Peneva_employees.Tests
         public void GetPairEmployeesWorkedLongest_ShouldReturnCorrectResultWhenSingleDayOverlap()
         {
             // Arrange
-            var employees = new List<Employee>
+            var employees = new Dictionary<int, List<Employee>>
             {
-                new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 1, 15) },
-                new Employee { Id = 2, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 15), DateTo = new DateOnly(2020, 1, 31) }
+                [1] =
+                [new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 1, 15) },
+                new Employee { Id = 2, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 15), DateTo = new DateOnly(2020, 1, 31) }]
             };
 
             // Act
@@ -253,11 +263,10 @@ namespace Mayya_Peneva_employees.Tests
         public void GetPairEmployeesWorkedLongest_ShouldReturnCorrectNumberOfCombinationsWhenHavingLargeDataset()
         {
             // Arrange
-            var employees = new List<Employee>();
-
+            var employees = new Dictionary<int, List<Employee>> { [1] = [] };
             for (int i = 1; i <= 100; i++)
             {
-                employees.Add(new Employee
+                employees[1].Add(new Employee
                 {
                     Id = i,
                     ProjectId = 1,
@@ -280,10 +289,11 @@ namespace Mayya_Peneva_employees.Tests
         public void GetPairEmployeesWorkedLongest_ShouldReturnCorrectResultWhenMultiYearOverlap()
         {
             // Arrange
-            var employees = new List<Employee>
+            var employees = new Dictionary<int, List<Employee>>
             {
-                new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2018, 1, 1), DateTo = new DateOnly(2022, 12, 31) },
-                new Employee { Id = 2, ProjectId = 1, DateFrom = new DateOnly(2019, 6, 1), DateTo = new DateOnly(2021, 6, 30) }
+                [1] =
+                [new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2018, 1, 1), DateTo = new DateOnly(2022, 12, 31) },
+                new Employee { Id = 2, ProjectId = 1, DateFrom = new DateOnly(2019, 6, 1), DateTo = new DateOnly(2021, 6, 30) }]
             };
             var actualDaysWorked = 761;
 
@@ -306,13 +316,15 @@ namespace Mayya_Peneva_employees.Tests
         public void GetPairEmployeesWorkedLongest_ShouldReturnCorrectResultWhenHavingMultipleProjectsComplexScenario()
         {
             // Arrange
-            var employees = new List<Employee>
+            var employees = new Dictionary<int, List<Employee>>
             {
-                new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 4, 10) },
+                [1] =
+                [new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 4, 10) },
                 new Employee { Id = 2, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 4, 10) },
-                new Employee { Id = 3, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 2, 20) },
-                new Employee { Id = 4, ProjectId = 2, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 6, 30) },
-                new Employee { Id = 5, ProjectId = 2, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 6, 30) }
+                new Employee { Id = 3, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 2, 20) }],
+                [2] =
+                [new Employee { Id = 4, ProjectId = 2, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 6, 30) },
+                new Employee { Id = 5, ProjectId = 2, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 6, 30) }]
             };
             var actualDaysWorked = 182;
 

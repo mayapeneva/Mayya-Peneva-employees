@@ -2,11 +2,19 @@
 {
     public class EmployeesViewModel
     {
-        public int EmployeeOneId { get; set; }
+        public EmployeesViewModel(int employeeOneId, int employeeTwoId, int projectId, int daysWorked)
+        {
+            this.EmployeeOneId = employeeOneId;
+            this.EmployeeTwoId = employeeTwoId;
+            this.ProjectId = projectId;
+            this.DaysWorked = daysWorked;
+        }
 
-        public int EmployeeTwoId { get; set; }
+        public int EmployeeOneId { get; private set; }
 
-        public int ProjectId { get; set; }
+        public int EmployeeTwoId { get; private set; }
+
+        public int ProjectId { get; private set; }
 
         public int DaysWorked { get; set; }
     }
