@@ -13,10 +13,28 @@ namespace Mayya_Peneva_employees.Tests
         }
 
         [Fact]
-        public void GetPairEmployeesWorkedLongest_ShouldReturnEmptyResultWhenNoEmployees()
+        public void GetPairEmployeesWorkedLongest_ShouldReturnEmptyResultWhenNoProjectNoEmployees()
         {
             // Arrange
             var employees = new Dictionary<int, List<Employee>>();
+
+            // Act
+            var actualResult = _service.GetPairEmployeesWorkedLongest(employees);
+
+            // Assert
+            Assert.NotNull(actualResult);
+            Assert.NotEmpty(actualResult.Errors);
+            Assert.Empty(actualResult.EmployeesPerProject);
+        }
+
+        [Fact]
+        public void GetPairEmployeesWorkedLongest_ShouldReturnEmptyResultWhenHasProjectButNoEmployees()
+        {
+            // Arrange
+            var employees = new Dictionary<int, List<Employee>>
+            {
+                { 1, new List<Employee>() }
+            };
 
             // Act
             var actualResult = _service.GetPairEmployeesWorkedLongest(employees);
@@ -55,6 +73,28 @@ namespace Mayya_Peneva_employees.Tests
                 [1] =
                 [new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 6, 30) },
                 new Employee { Id = 2, ProjectId = 1, DateFrom = new DateOnly(2020, 7, 1), DateTo = new DateOnly(2020, 12, 31) }]
+            };
+
+            // Act
+            var actualResult = _service.GetPairEmployeesWorkedLongest(employees);
+
+            // Assert
+            Assert.NotNull(actualResult);
+            Assert.NotEmpty(actualResult.Errors);
+            Assert.Empty(actualResult.EmployeesPerProject);
+        }
+
+        [Fact]
+        public void GetPairEmployeesWorkedLongest_ShouldReturnEmptyResultWhenDuplicateEmployeeId()
+        {
+            var employees = new Dictionary<int, List<Employee>>
+            {
+                { 1, new List<Employee>
+                    {
+                        new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 12, 31) },
+                        new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 12, 31) }
+                    }
+                }
             };
 
             // Act
@@ -122,6 +162,32 @@ namespace Mayya_Peneva_employees.Tests
         }
 
         [Fact]
+        public void GetPairEmployeesWorkedLongest_ShouldReturnCorrectPairOrderWhenReversedPairOrder()
+        {
+            var employees = new Dictionary<int, List<Employee>>
+            {
+                { 1, new List<Employee>
+                    {
+                        new Employee { Id = 2, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 12, 31) },
+                        new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 12, 31) }
+                    }
+                }
+            };
+
+            // Act
+            var actualResult = _service.GetPairEmployeesWorkedLongest(employees);
+
+            // Assert
+            Assert.NotNull(actualResult);
+            Assert.Empty(actualResult.Errors);
+            Assert.Single(actualResult.EmployeesPerProject);
+
+            var employeePair = actualResult.EmployeesPerProject.First();
+            Assert.Equal(1, employeePair.EmployeeOneId);
+            Assert.Equal(2, employeePair.EmployeeTwoId);
+        }
+
+        [Fact]
         public void GetPairEmployeesWorkedLongest_ShouldReturnCorrectResultWhenMoreProjects()
         {
             // Arrange
@@ -149,6 +215,38 @@ namespace Mayya_Peneva_employees.Tests
             Assert.Equal(2, employeePair.EmployeeTwoId);
             Assert.Equal(1, employeePair.ProjectId);
             Assert.Equal(actualDaysWorked, employeePair.DaysWorked);
+        }
+
+        [Fact]
+        public void GetPairEmployeesWorkedLongest_ShouldReturnLastProjectWhenSamePairInMultipleProjects()
+        {
+            // Arrange
+            var employees = new Dictionary<int, List<Employee>>
+            {
+                { 1, new List<Employee>
+                    {
+                        new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 6, 30) },
+                        new Employee { Id = 2, ProjectId = 1, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 6, 30) }
+                    }
+                },
+                { 2, new List<Employee>
+                    {
+                        new Employee { Id = 1, ProjectId = 2, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 6, 30) },
+                        new Employee { Id = 2, ProjectId = 2, DateFrom = new DateOnly(2020, 1, 1), DateTo = new DateOnly(2020, 6, 30) }
+                    }
+                }
+            };
+
+            // Act
+            var actualResult = _service.GetPairEmployeesWorkedLongest(employees);
+
+            // Assert
+            Assert.NotNull(actualResult);
+            Assert.Empty(actualResult.Errors);
+            Assert.Single(actualResult.EmployeesPerProject);
+
+            var employeePair = actualResult.EmployeesPerProject.First();
+            Assert.Equal(2, employeePair.ProjectId);
         }
 
         [Fact]
@@ -310,6 +408,52 @@ namespace Mayya_Peneva_employees.Tests
             Assert.Equal(2, employeePair.EmployeeTwoId);
             Assert.Equal(1, employeePair.ProjectId);
             Assert.Equal(actualDaysWorked, employeePair.DaysWorked);
+        }
+
+        [Fact]
+        public void GetPairEmployeesWorkedLongest_ShouldReturnCorrectResultWhentLeapYear()
+        {
+            // Arrange
+            var employees = new Dictionary<int, List<Employee>>
+            {
+                { 1, new List<Employee>
+                    {
+                        new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2020, 2, 1), DateTo = new DateOnly(2020, 3, 15) },
+                        new Employee { Id = 2, ProjectId = 1, DateFrom = new DateOnly(2020, 2, 15), DateTo = new DateOnly(2020, 3, 15) }
+                    }
+                }
+            };
+            var actualDaysWorked = 30;
+
+            // Act
+            var actualResult = _service.GetPairEmployeesWorkedLongest(employees);
+
+            // Assert
+            Assert.True(actualResult.IsSuccessful());
+            Assert.Equal(actualDaysWorked, actualResult.EmployeesPerProject.First().DaysWorked);
+        }
+
+        [Fact]
+        public void GetPairEmployeesWorkedLongest_ShouldReturnCorrectResultWhenNotLeapYear()
+        {
+            // Arrange
+            var employees = new Dictionary<int, List<Employee>>
+            {
+                { 1, new List<Employee>
+                    {
+                        new Employee { Id = 1, ProjectId = 1, DateFrom = new DateOnly(2021, 2, 1), DateTo = new DateOnly(2021, 3, 15) },
+                        new Employee { Id = 2, ProjectId = 1, DateFrom = new DateOnly(2021, 2, 15), DateTo = new DateOnly(2021, 3, 15) }
+                    }
+                }
+            };
+            var actualDaysWorked = 29;
+
+            // Act
+            var actualResult = _service.GetPairEmployeesWorkedLongest(employees);
+
+            // Assert
+            Assert.True(actualResult.IsSuccessful());
+            Assert.Equal(actualDaysWorked, actualResult.EmployeesPerProject.First().DaysWorked);
         }
 
         [Fact]
