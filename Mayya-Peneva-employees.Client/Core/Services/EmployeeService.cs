@@ -6,70 +6,104 @@ namespace Mayya_Peneva_employees.Client.Core.Services
 {
     public class EmployeeService : IEmployeeService
     {
+        private int maxDaysWorkedTogetherOverall;
+        private Dictionary<(int, int), EmployeePairInfo> pairsWorkedTogetherLongest;
+
         public EmployeesResult GetPairEmployeesWorkedLongest(Dictionary<int, List<Employee>> employeesGroupsPerProject)
         {
             var result = new EmployeesResult();
             if (employeesGroupsPerProject.Count == 0)
             {
-                result.Errors.Add("There are no employeesGroupsPerProject who worked together on the same project.");
+                result.Errors.Add("There are no employee groups who worked together on the same project.");
                 return result;
             }
 
-            var employeesPairWorkDurations = new Dictionary<(int, int), int>();
-            foreach (var project in employeesGroupsPerProject)
+            maxDaysWorkedTogetherOverall = 0;
+            pairsWorkedTogetherLongest = new Dictionary<(int, int), EmployeePairInfo>();
+
+            foreach (var (projectId, projectEmployees) in employeesGroupsPerProject)
             {
-                var projectEmployees = project.Value;
-                for (int i = 0; i < projectEmployees.Count - 1; i++)
+                this.CalculatePairOverlapsForProject(projectId, projectEmployees);
+            }
+
+            if (pairsWorkedTogetherLongest.Count == 0)
+            {
+                result.Errors.Add("There are no employee pairs who worked together on any project.");
+                return result;
+            }
+
+            var employeesPerProject = new List<EmployeesViewModel>(pairsWorkedTogetherLongest.Count);
+            foreach (var (pairKey, pairInfo) in pairsWorkedTogetherLongest)
+            {
+                var (employeeOneId, employeeTwoId) = pairKey;
+                employeesPerProject.Add(new EmployeesViewModel(
+                    employeeOneId,
+                    employeeTwoId,
+                    pairInfo.SharedProjectId,
+                    pairInfo.TotalDaysWorked));
+            }
+
+            result.EmployeesPerProject = employeesPerProject;
+
+            return result;
+        }
+
+        private void CalculatePairOverlapsForProject(int projectId, List<Employee> projectEmployees)
+        {
+            if (projectEmployees.Count < 2)
+                return;
+
+            for (int i = 0; i < projectEmployees.Count - 1; i++)
+            {
+                var employeeOne = projectEmployees[i];
+                for (int j = i + 1; j < projectEmployees.Count; j++)
                 {
-                    for (int j = i + 1; j < projectEmployees.Count; j++)
+                    var employeeTwo = projectEmployees[j];
+                    if (employeeOne.Id == employeeTwo.Id)
+                        continue;
+
+                    var daysWorked = CalculateOverlapDays(
+                        employeeOne.DateFrom,
+                        employeeOne.DateTo,
+                        employeeTwo.DateFrom,
+                        employeeTwo.DateTo);
+
+                    if (daysWorked > 0)
                     {
-                        var employeeOne = projectEmployees[i];
-                        var employeeTwo = projectEmployees[j];
+                        var pairKey = employeeOne.Id < employeeTwo.Id
+                            ? (employeeOne.Id, employeeTwo.Id)
+                            : (employeeTwo.Id, employeeOne.Id);
 
-                        if (employeeOne.Id == employeeTwo.Id) continue;
+                        if (daysWorked < maxDaysWorkedTogetherOverall)
+                            continue;
 
-                        var daysWorked = CalculateOverlapDays(employeeOne.DateFrom, employeeOne.DateTo, employeeTwo.DateFrom, employeeTwo.DateTo);
-                        if (daysWorked > 0)
+                        if (daysWorked > maxDaysWorkedTogetherOverall)
                         {
-                            var pairKey = employeeOne.Id < employeeTwo.Id ? (employeeOne.Id, employeeTwo.Id) : (employeeTwo.Id, employeeOne.Id);
-                            employeesPairWorkDurations[pairKey] = employeesPairWorkDurations.GetValueOrDefault(pairKey) + daysWorked;
+                            maxDaysWorkedTogetherOverall = daysWorked;
+                            pairsWorkedTogetherLongest.Clear();
+                        }
+
+                        if (pairsWorkedTogetherLongest.TryGetValue(pairKey, out var existingPair))
+                        {
+                            existingPair.SharedProjectId = projectId;
+                        }
+                        else
+                        {
+                            pairsWorkedTogetherLongest[pairKey] = new EmployeePairInfo
+                            {
+                                TotalDaysWorked = daysWorked,
+                                SharedProjectId = projectId
+                            };
                         }
                     }
                 }
             }
-
-            if (employeesPairWorkDurations.Count == 0)
-            {
-                result.Errors.Add("There are no employeesGroupsPerProject who worked together on any project.");
-                return result;
-            }
-
-            var employeesPerProject = new List<EmployeesViewModel>();
-            int maxDaysWorkedTogether = employeesPairWorkDurations.Values.Max();
-            foreach (var pair in employeesPairWorkDurations.Where(p => p.Value == maxDaysWorkedTogether))
-            {
-                var (employeeOneId, employeeTwoId) = pair.Key;
-                foreach (var projectGroup in employeesGroupsPerProject)
-                {
-                    if (projectGroup.Value.Any(e => e.Id == employeeOneId) && projectGroup.Value.Any(e => e.Id == employeeTwoId))
-                    {
-                        employeesPerProject.Add(new EmployeesViewModel(
-                            employeeOneId,
-                            employeeTwoId,
-                            projectGroup.Key,
-                            maxDaysWorkedTogether));
-                    }
-                }
-            }
-
-            result.EmployeesPerProject = employeesPerProject;
-            return result;
         }
 
-        private int CalculateOverlapDays(DateOnly startOne, DateOnly endOne, DateOnly startTwo, DateOnly endTwo)
+        private static int CalculateOverlapDays(DateOnly startOne, DateOnly endOne, DateOnly startTwo, DateOnly endTwo)
         {
             var overlapStart = Math.Max(startOne.DayNumber, startTwo.DayNumber);
-            int overlapEnd = Math.Min(endOne.DayNumber, endTwo.DayNumber);
+            var overlapEnd = Math.Min(endOne.DayNumber, endTwo.DayNumber);
 
             return overlapStart <= overlapEnd ? (overlapEnd - overlapStart + 1) : 0;
         }
