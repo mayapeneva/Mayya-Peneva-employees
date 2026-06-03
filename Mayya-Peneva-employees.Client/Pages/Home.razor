@@ -9,7 +9,7 @@
 <div class="container mt-5">
     <div class="row mb-4">
         <div class="col-md-12">
-            <h2>Employee Collaboration</h2>
+            <h2>Employee Collaboration Analyzer</h2>
             <p>Identify employee pairs who have worked together on common projects for the longest period of time</p>
             <hr />
         </div>
@@ -35,7 +35,7 @@
                         </div>
 
                         <div class="button-group d-flex gap-2">
-                            <Button Color="ButtonColor.Primary" Type="ButtonType.Submit" Disabled="@(Input?.CsvFile == null)">Select</Button>
+                            <Button Color="ButtonColor.Primary" Type="ButtonType.Submit" Disabled="@(Input?.CsvFile == null)">Analyze</Button>
                             <Button Color="ButtonColor.Secondary" Type="ButtonType.Reset" @onclick="ClearAll">Clear</Button>
                         </div>
                     </EditForm>
@@ -77,7 +77,8 @@
                 <CardBody>
                     <ol class="small">
                         <li>Upload a CSV file with employee project information</li>
-                        <li>Click Select to see all pairs with longest collaboration time</li>
+                        <li>Click Analyze to process the data</li>
+                        <li>View employee pairs with longest collaboration time</li>
                     </ol>
                 </CardBody>
             </Card>
@@ -93,7 +94,7 @@
         </div>
     }
 
-    @if (!String.IsNullOrWhiteSpace(ErrorMessage))
+    @if (!string.IsNullOrWhiteSpace(ErrorMessage))
     {
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <h6 class="alert-heading">
