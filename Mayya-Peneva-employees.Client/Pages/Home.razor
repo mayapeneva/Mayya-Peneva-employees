@@ -9,7 +9,7 @@
 <div class="container mt-5">
     <div class="row mb-4">
         <div class="col-md-12">
-            <h2>Employee Collaboration Analyzer</h2>
+            <h2>Employee Collaboration Analyser</h2>
             <p>Identify employee pairs who have worked together on common projects for the longest period of time</p>
             <hr />
         </div>
@@ -27,7 +27,7 @@
 
                         <div class="form-group mb-3">
                             <label for="csvFile" class="form-label">Select CSV File:</label>
-                            <InputFile id="csvFile" class="form-control" OnChange="@LoadFile" accept=".csv" />
+                            <InputFile id="csvFile" class="form-control" OnChange="@LoadFile" accept=".csv" disabled="@IsLoading"/>
                             <ValidationMessage For="() => Input!.CsvFile" class="text-danger small mt-1" />
                             <small class="text-muted d-block mt-2">
                                 Expected format: EmployeeID, ProjectID, DateFrom, DateTo (Max 5 MB)
@@ -35,7 +35,7 @@
                         </div>
 
                         <div class="button-group d-flex gap-2">
-                            <Button Color="ButtonColor.Primary" Type="ButtonType.Submit" Disabled="@(Input?.CsvFile == null)">Analyze</Button>
+                            <Button Color="ButtonColor.Primary" Type="ButtonType.Submit" Disabled="@(Input?.CsvFile == null)">Analyse</Button>
                             <Button Color="ButtonColor.Secondary" Type="ButtonType.Reset" @onclick="ClearAll">Clear</Button>
                         </div>
                     </EditForm>
@@ -67,6 +67,11 @@
                     </CardBody>
                 </Card>
             }
+
+            @if (IsLoading)
+            {
+                <h2 class="text-info">Analysing.....</h2>
+            }
         </div>
 
         <div class="col-md-4">
@@ -77,7 +82,7 @@
                 <CardBody>
                     <ol class="small">
                         <li>Upload a CSV file with employee project information</li>
-                        <li>Click Analyze to process the data</li>
+                        <li>Click Analyse to process the data</li>
                         <li>View employee pairs with longest collaboration time</li>
                     </ol>
                 </CardBody>
@@ -114,6 +119,7 @@
 
     private IEnumerable<KeyValuePair<int, int>>? EmployeeIdsPairs { get; set; }
     private IEnumerable<EmployeesViewModel>? EmployeesPerProject { get; set; }
+    private bool IsLoading { get; set; }
     private string? ErrorMessage { get; set; }
 
     protected override void OnInitialized()
@@ -121,6 +127,7 @@
         Input ??= new();
         EmployeeIdsPairs = [];
         EmployeesPerProject = [];
+        IsLoading = false;
     }
 
     private void LoadFile(InputFileChangeEventArgs e)
@@ -140,6 +147,7 @@
         try
         {
             var hasError = false;
+            IsLoading = true;
             var employeesGroupsPerProject = new Dictionary<int, List<Employee>>();
 
             using (var reader = new StreamReader(Input.CsvFile.OpenReadStream(MaxFileSize)))
@@ -196,6 +204,10 @@
             Logger.LogError(ex, "Error processing employee file");
             ErrorMessage = "An unexpected error occurred while processing the file. Please try again.";
         }
+        finally
+        {
+            IsLoading = false;
+        }
     }
 
     private void ClearAll()
@@ -204,5 +216,6 @@
         EmployeeIdsPairs = [];
         EmployeesPerProject = [];
         ErrorMessage = null;
+        IsLoading = false;
     }
 }
