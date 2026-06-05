@@ -3,6 +3,6 @@
     public class EmployeePairInfo
     {
         public int TotalDaysWorked { get; set; }
-        public int SharedProjectId { get; set; }
+        public HashSet<int> SharedProjectIds { get; set; } = new();
     }
 }

@@ -36,11 +36,14 @@ namespace Mayya_Peneva_employees.Client.Core.Services
             foreach (var (pairKey, pairInfo) in pairsWorkedTogetherLongest)
             {
                 var (employeeOneId, employeeTwoId) = pairKey;
-                employeesPerProject.Add(new EmployeesViewModel(
-                    employeeOneId,
-                    employeeTwoId,
-                    pairInfo.SharedProjectId,
-                    pairInfo.TotalDaysWorked));
+                foreach (var projectId in pairInfo.SharedProjectIds)
+                {
+                    employeesPerProject.Add(new EmployeesViewModel(
+                        employeeOneId,
+                        employeeTwoId,
+                        projectId,
+                        pairInfo.TotalDaysWorked));
+                }
             }
 
             result.EmployeesPerProject = employeesPerProject;
@@ -85,14 +88,14 @@ namespace Mayya_Peneva_employees.Client.Core.Services
 
                         if (pairsWorkedTogetherLongest.TryGetValue(pairKey, out var existingPair))
                         {
-                            existingPair.SharedProjectId = projectId;
+                            existingPair.SharedProjectIds.Add(projectId);
                         }
                         else
                         {
                             pairsWorkedTogetherLongest[pairKey] = new EmployeePairInfo
                             {
                                 TotalDaysWorked = daysWorked,
-                                SharedProjectId = projectId
+                                SharedProjectIds = [projectId]
                             };
                         }
                     }
